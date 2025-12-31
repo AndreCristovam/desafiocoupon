@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 
 import com.andrecristovam.desafiocoupon.domain.enun.ECouponStatus;
 import com.andrecristovam.desafiocoupon.domain.exception.BusinessException;
+import com.andrecristovam.desafiocoupon.domain.exception.ErrorMessages;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,9 @@ import lombok.Getter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Coupon {
 
+	private static final String CODE_SANITIZE_REGEX = "[^A-Za-z0-9]";
+	private static final String MIN_VALUE = "0.5";
+	
 	@EqualsAndHashCode.Include
 	private final String code;
 
@@ -39,19 +43,19 @@ public class Coupon {
 	private static void validate(String code, String description, BigDecimal discountValue, OffsetDateTime expirationDate) {
 
 		if (code == null || code.length() != 6) {
-			throw new BusinessException("Código do cupom deve conter 6 caracteres alfanuméricos");
+			throw new BusinessException(ErrorMessages.CODE_INVALID);
 		}
 
 		if (description == null || description.isBlank()) {
-			throw new BusinessException("Descrição é obrigatória");
+			throw new BusinessException(ErrorMessages.DESCRIPTION_REQUIRED);
 		}
 
-		if (discountValue == null || discountValue.compareTo(new BigDecimal("0.5")) < 0) {
-			throw new BusinessException("Valor mínimo de desconto é 0.5");
+		if (discountValue == null || discountValue.compareTo(new BigDecimal(MIN_VALUE)) < 0) {
+			throw new BusinessException(ErrorMessages.DISCOUNT_MIN_VALUE);
 		}
 
 		if (expirationDate == null || expirationDate.isBefore(OffsetDateTime.now())) {
-			throw new BusinessException("Data de expiração não pode estar no passado");
+			throw new BusinessException(ErrorMessages.EXPIRATION_IN_PAST);
 		}
 	}
 
@@ -59,12 +63,12 @@ public class Coupon {
 		if (code == null) {
 			return null;
 		}
-		return code.replaceAll("[^a-zA-Z0-9]", "");
+		return code.replaceAll(CODE_SANITIZE_REGEX, "");
 	}
 
 	public void delete() {
 		if (this.status == ECouponStatus.DELETED) {
-			throw new BusinessException("Cupom já está deletado");
+			throw new BusinessException(ErrorMessages.COUPON_ALREADY_DELETED);
 		}
 		this.status = ECouponStatus.DELETED;
 	}

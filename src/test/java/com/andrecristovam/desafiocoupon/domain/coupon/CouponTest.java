@@ -12,8 +12,9 @@ import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import com.andrecristovam.desafiocoupon.domain.coupon.enun.ECouponStatus;
-import com.andrecristovam.desafiocoupon.domain.coupon.exception.BusinessException;
+import com.andrecristovam.desafiocoupon.domain.enun.ECouponStatus;
+import com.andrecristovam.desafiocoupon.domain.exception.BusinessException;
+import com.andrecristovam.desafiocoupon.domain.exception.ErrorMessages;
 
 public class CouponTest {
 
@@ -36,7 +37,7 @@ public class CouponTest {
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			Coupon.create("A!2", "Cupom inválido", new BigDecimal("10.0"), tomorrow(), true);
 		});
-		assertEquals("Código do cupom deve conter 6 caracteres alfanuméricos", exception.getMessage());
+		assertEquals(ErrorMessages.CODE_INVALID, exception.getMessage());
 	}
 	
 	@Test
@@ -44,7 +45,7 @@ public class CouponTest {
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			Coupon.create(null, "Cupom inválido", new BigDecimal("10.0"), tomorrow(), true);
 		});
-		assertEquals("Código do cupom deve conter 6 caracteres alfanuméricos", exception.getMessage());
+		assertEquals(ErrorMessages.CODE_INVALID, exception.getMessage());
 	}
 	
 	@Test
@@ -52,7 +53,7 @@ public class CouponTest {
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			Coupon.create("AB1232", "", new BigDecimal("10.0"), tomorrow(), true);
 		});
-		assertEquals("Descrição é obrigatória", exception.getMessage());
+		assertEquals(ErrorMessages.DESCRIPTION_REQUIRED, exception.getMessage());
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class CouponTest {
 		coupon.delete();
 
 		BusinessException exception = assertThrows(BusinessException.class, coupon::delete);
-		assertEquals("Cupom já está deletado", exception.getMessage());
+		assertEquals(ErrorMessages.COUPON_ALREADY_DELETED, exception.getMessage());
 	}
 
 	@Test
@@ -82,7 +83,7 @@ public class CouponTest {
 			Coupon.create("ABC123", "Cupom com desconto inválido", new BigDecimal("0.3"), tomorrow(),
 					true);
 		});
-		assertEquals("Valor mínimo de desconto é 0.5", exception.getMessage());
+		assertEquals(ErrorMessages.DISCOUNT_MIN_VALUE, exception.getMessage());
 	}
 
 	@Test
@@ -90,7 +91,7 @@ public class CouponTest {
 		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			Coupon.create("ABC123", "Cupom expirado", new BigDecimal("10.0"), OffsetDateTime.now().minusDays(1), true);
 		});
-		assertEquals("Data de expiração não pode estar no passado", exception.getMessage());
+		assertEquals(ErrorMessages.EXPIRATION_IN_PAST, exception.getMessage());
 	}
 	
 	@Test
@@ -123,7 +124,7 @@ public class CouponTest {
 	    BusinessException exception = assertThrows(BusinessException.class, () -> {
 	        Coupon.create("ABC123", null, new BigDecimal("10.0"), tomorrow(), true);
 	    });
-	    assertEquals("Descrição é obrigatória", exception.getMessage());
+	    assertEquals(ErrorMessages.DESCRIPTION_REQUIRED, exception.getMessage());
 	}
 
 	@Test
@@ -131,7 +132,7 @@ public class CouponTest {
 	    BusinessException exception = assertThrows(BusinessException.class, () -> {
 	        Coupon.create("ABC123", "Cupom", null, tomorrow(), true);
 	    });
-	    assertEquals("Valor mínimo de desconto é 0.5", exception.getMessage());
+	    assertEquals(ErrorMessages.DISCOUNT_MIN_VALUE, exception.getMessage());
 	}
 
 	@Test
@@ -139,7 +140,7 @@ public class CouponTest {
 	    BusinessException exception = assertThrows(BusinessException.class, () -> {
 	        Coupon.create("ABC123", "Cupom", new BigDecimal("5.0"), null, true);
 	    });
-	    assertEquals("Data de expiração não pode estar no passado", exception.getMessage());
+	    assertEquals(ErrorMessages.EXPIRATION_IN_PAST, exception.getMessage());
 	}
 
 	@Test
@@ -147,7 +148,7 @@ public class CouponTest {
 	    BusinessException exception = assertThrows(BusinessException.class, () -> {
 	        Coupon.create(null, "Cupom", new BigDecimal("5.0"), tomorrow(), true);
 	    });
-	    assertEquals("Código do cupom deve conter 6 caracteres alfanuméricos", exception.getMessage());
+	    assertEquals(ErrorMessages.CODE_INVALID, exception.getMessage());
 	}
 	
 	@Test

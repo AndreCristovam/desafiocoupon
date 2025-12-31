@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.andrecristovam.desafiocoupon.DesafiocouponApplication;
+import com.andrecristovam.desafiocoupon.domain.exception.ErrorMessages;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(classes = DesafiocouponApplication.class)
@@ -97,7 +98,7 @@ public class CouponApiIntegrationTest {
     void retornar404QuandoCupomNaoExistirTest() throws Exception {
         mockMvc.perform(get("/coupon/{id}", "nao-existe"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Cupom não encontrado"))
+                .andExpect(jsonPath("$.message").value(ErrorMessages.COUPON_NOT_FOUND))
                 .andExpect(jsonPath("$.status").value(404));
     }
 
@@ -119,7 +120,7 @@ public class CouponApiIntegrationTest {
                     .content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
-                        .value("Código do cupom deve conter 6 caracteres alfanuméricos"));
+                        .value(ErrorMessages.CODE_INVALID));
     }
 
     @Test
@@ -140,7 +141,7 @@ public class CouponApiIntegrationTest {
                     .content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
-                        .value("Data de expiração não pode estar no passado"));
+                        .value(ErrorMessages.EXPIRATION_IN_PAST));
     }
 
     @Test
@@ -172,7 +173,7 @@ public class CouponApiIntegrationTest {
 
         mockMvc.perform(delete("/coupon/{id}", id))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("Cupom já está deletado"));
+            .andExpect(jsonPath("$.message").value(ErrorMessages.COUPON_ALREADY_DELETED));
     }
     
     @Test
@@ -199,7 +200,7 @@ public class CouponApiIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("Já existe um cupom com este código"))
+            .andExpect(jsonPath("$.message").value(ErrorMessages.DUPLICATE_CODE))
             .andExpect(jsonPath("$.status").value(400));
     }
 }
