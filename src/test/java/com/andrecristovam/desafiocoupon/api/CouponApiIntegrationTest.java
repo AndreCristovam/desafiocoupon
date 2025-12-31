@@ -174,4 +174,32 @@ public class CouponApiIntegrationTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("Cupom já está deletado"));
     }
+    
+    @Test
+    void naoPermitirCriarCupomDuplicadoTest() throws Exception {
+
+    	var expiration = OffsetDateTime.now().plusDays(1).withNano(0).toString();
+    	
+        String body = """
+            {
+              "code": "ABC-127",
+              "description": "Cupom duplicado",
+              "discountValue": 1.5,
+              "expirationDate": "%s",
+              "published": true
+            }
+        """.formatted(expiration);
+        
+        mockMvc.perform(post("/coupon")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/coupon")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("Já existe um cupom com este código"))
+            .andExpect(jsonPath("$.status").value(400));
+    }
 }
