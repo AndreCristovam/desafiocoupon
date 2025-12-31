@@ -3,6 +3,7 @@ package com.andrecristovam.desafiocoupon.application.usecase;
 import org.springframework.stereotype.Service;
 
 import com.andrecristovam.desafiocoupon.domain.coupon.Coupon;
+import com.andrecristovam.desafiocoupon.domain.coupon.exception.NotFoundException;
 import com.andrecristovam.desafiocoupon.infrastructure.persistence.mapper.CouponPersistenceMapper;
 import com.andrecristovam.desafiocoupon.infrastructure.persistence.repository.CouponRepository;
 
@@ -20,7 +21,7 @@ public class DeleteCouponUseCase {
     public void execute(String id) {
 
         var entity = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Cupom não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Cupom não encontrado"));
 
         Coupon coupon = mapper.toDomain(entity);
 

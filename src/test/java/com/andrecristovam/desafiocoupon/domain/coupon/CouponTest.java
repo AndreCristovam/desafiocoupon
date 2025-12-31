@@ -7,19 +7,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.Test;
 
 import com.andrecristovam.desafiocoupon.domain.coupon.enun.ECouponStatus;
+import com.andrecristovam.desafiocoupon.domain.coupon.exception.BusinessException;
 
 public class CouponTest {
 
 	@Test
 	void criarCupomValidoTest() {
 
-		Coupon coupon = Coupon.create("AB1232!", "Cupom de teste", new BigDecimal("10.0"), OffsetDateTime.now().plusDays(1),
+		Coupon coupon = Coupon.create("AB1232!", "Cupom de teste", new BigDecimal("10.0"), tomorrow(),
 				true);
 
 		assertNotNull(coupon);
@@ -32,24 +32,24 @@ public class CouponTest {
 
 	@Test
 	void criarCupomComCodigoInvalidoTest() {
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-			Coupon.create("A!2", "Cupom inválido", new BigDecimal("10.0"), OffsetDateTime.now().plusDays(1), true);
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			Coupon.create("A!2", "Cupom inválido", new BigDecimal("10.0"), tomorrow(), true);
 		});
 		assertEquals("Código do cupom deve conter 6 caracteres alfanuméricos", exception.getMessage());
 	}
 	
 	@Test
 	void criarCupomComCodigoVazioNullTest() {
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-			Coupon.create(null, "Cupom inválido", new BigDecimal("10.0"), OffsetDateTime.now().plusDays(1), true);
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			Coupon.create(null, "Cupom inválido", new BigDecimal("10.0"), tomorrow(), true);
 		});
 		assertEquals("Código do cupom deve conter 6 caracteres alfanuméricos", exception.getMessage());
 	}
 	
 	@Test
 	void criarCupomComSemDescricaoTest() {
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-			Coupon.create("AB1232", "", new BigDecimal("10.0"), OffsetDateTime.now().plusDays(1), true);
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			Coupon.create("AB1232", "", new BigDecimal("10.0"), tomorrow(), true);
 		});
 		assertEquals("Descrição é obrigatória", exception.getMessage());
 	}
@@ -57,7 +57,7 @@ public class CouponTest {
 	@Test
 	void deletarCupomValidoTest() {
 		Coupon coupon = Coupon.create("ABC123", "Cupom para deletar", new BigDecimal("5.0"),
-				OffsetDateTime.now().plusDays(1), false);
+				tomorrow(), false);
 
 		assertEquals(ECouponStatus.ACTIVE, coupon.getStatus());
 		coupon.delete();
@@ -67,18 +67,18 @@ public class CouponTest {
 	@Test
 	void deletarCupomJaDeletadoTest() {
 		Coupon coupon = Coupon.create("ABC123", "Cupom já deletado", new BigDecimal("15.0"),
-				OffsetDateTime.now().plusDays(1), true);
+				tomorrow(), true);
 
 		coupon.delete();
 
-		IllegalStateException exception = assertThrows(IllegalStateException.class, coupon::delete);
+		BusinessException exception = assertThrows(BusinessException.class, coupon::delete);
 		assertEquals("Cupom já está deletado", exception.getMessage());
 	}
 
 	@Test
 	void criarCupomDescontoMenorQueMinimoTest() {
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-			Coupon.create("ABC123", "Cupom com desconto inválido", new BigDecimal("0.3"), OffsetDateTime.now().plusDays(1),
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
+			Coupon.create("ABC123", "Cupom com desconto inválido", new BigDecimal("0.3"), tomorrow(),
 					true);
 		});
 		assertEquals("Valor mínimo de desconto é 0.5", exception.getMessage());
@@ -86,9 +86,22 @@ public class CouponTest {
 
 	@Test
 	void criarCupomComDataNoPassadoTest() {
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+		BusinessException exception = assertThrows(BusinessException.class, () -> {
 			Coupon.create("ABC123", "Cupom expirado", new BigDecimal("10.0"), OffsetDateTime.now().minusDays(1), true);
 		});
 		assertEquals("Data de expiração não pode estar no passado", exception.getMessage());
+	}
+	
+	@Test
+	void deveRemoverCaracteresEspeciaisDoCodigo() {
+
+	    Coupon coupon = Coupon.create("A!B-123", "Cupom", new BigDecimal("5.0"),
+	    		tomorrow(), true);
+
+	    assertEquals("AB123", coupon.getCode());
+	}
+	
+	private OffsetDateTime tomorrow() {
+	    return OffsetDateTime.now().plusDays(1);
 	}
 }

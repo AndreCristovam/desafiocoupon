@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.andrecristovam.desafiocoupon.domain.coupon.Coupon;
+import com.andrecristovam.desafiocoupon.domain.coupon.exception.NotFoundException;
 import com.andrecristovam.desafiocoupon.infrastructure.persistence.mapper.CouponPersistenceMapper;
 import com.andrecristovam.desafiocoupon.infrastructure.persistence.repository.CouponRepository;
 
@@ -21,6 +22,6 @@ public class GetCouponUseCase {
     	
     	return repository.findById(id)
                 .map(mapper::toDomain)
-                .orElseThrow(() -> new IllegalArgumentException("Cupom não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Cupom não encontrado"));
     }
 }

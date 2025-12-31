@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import com.andrecristovam.desafiocoupon.domain.coupon.enun.ECouponStatus;
+import com.andrecristovam.desafiocoupon.domain.coupon.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,19 +39,19 @@ public class Coupon {
 	private static void validate(String code, String description, BigDecimal discountValue, OffsetDateTime expirationDate) {
 
 		if (code == null || code.length() != 6) {
-			throw new IllegalArgumentException("Código do cupom deve conter 6 caracteres alfanuméricos");
+			throw new BusinessException("Código do cupom deve conter 6 caracteres alfanuméricos");
 		}
 
 		if (description == null || description.isBlank()) {
-			throw new IllegalArgumentException("Descrição é obrigatória");
+			throw new BusinessException("Descrição é obrigatória");
 		}
 
 		if (discountValue == null || discountValue.compareTo(new BigDecimal("0.5")) < 0) {
-			throw new IllegalArgumentException("Valor mínimo de desconto é 0.5");
+			throw new BusinessException("Valor mínimo de desconto é 0.5");
 		}
 
 		if (expirationDate == null || expirationDate.isBefore(OffsetDateTime.now())) {
-			throw new IllegalArgumentException("Data de expiração não pode estar no passado");
+			throw new BusinessException("Data de expiração não pode estar no passado");
 		}
 	}
 
@@ -63,7 +64,7 @@ public class Coupon {
 
 	public void delete() {
 		if (this.status == ECouponStatus.DELETED) {
-			throw new IllegalStateException("Cupom já está deletado");
+			throw new BusinessException("Cupom já está deletado");
 		}
 		this.status = ECouponStatus.DELETED;
 	}
