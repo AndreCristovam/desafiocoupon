@@ -1,7 +1,9 @@
 package com.andrecristovam.desafiocoupon.domain.coupon;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
+import com.andrecristovam.desafiocoupon.domain.coupon.enun.ECouponStatus;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,22 +20,22 @@ public class Coupon {
 
 	private final String description;
 	private final BigDecimal discountValue;
-	private final LocalDate expirationDate;
+	private final OffsetDateTime expirationDate;
 	private final boolean published;
+	private ECouponStatus status;
+	private boolean redeemed;
 
-	private boolean deleted;
-
-	public static Coupon create(String code, String description, BigDecimal discountValue, LocalDate expirationDate,
+	public static Coupon create(String code, String description, BigDecimal discountValue, OffsetDateTime expirationDate,
 			boolean published) {
 
 		String sanitizedCode = sanitizeCode(code);
 
 		validate(sanitizedCode, description, discountValue, expirationDate);
 
-		return new Coupon(sanitizedCode, description, discountValue, expirationDate, published, false);
+		return new Coupon(sanitizedCode, description, discountValue, expirationDate, published, ECouponStatus.ACTIVE, false);
 	}
 
-	private static void validate(String code, String description, BigDecimal discountValue, LocalDate expirationDate) {
+	private static void validate(String code, String description, BigDecimal discountValue, OffsetDateTime expirationDate) {
 
 		if (code == null || code.length() != 6) {
 			throw new IllegalArgumentException("Código do cupom deve conter 6 caracteres alfanuméricos");
@@ -47,7 +49,7 @@ public class Coupon {
 			throw new IllegalArgumentException("Valor mínimo de desconto é 0.5");
 		}
 
-		if (expirationDate == null || expirationDate.isBefore(LocalDate.now())) {
+		if (expirationDate == null || expirationDate.isBefore(OffsetDateTime.now())) {
 			throw new IllegalArgumentException("Data de expiração não pode estar no passado");
 		}
 	}
@@ -60,9 +62,15 @@ public class Coupon {
 	}
 
 	public void delete() {
-		if (this.deleted) {
+		if (this.status == ECouponStatus.DELETED) {
 			throw new IllegalStateException("Cupom já está deletado");
 		}
-		this.deleted = true;
+		this.status = ECouponStatus.DELETED;
+	}
+	
+	public static Coupon restore(String code, String description, BigDecimal discountValue,
+			OffsetDateTime expirationDate, boolean published, ECouponStatus status, boolean redeemed) {
+		
+		return new Coupon(code, description, discountValue, expirationDate, published, status, redeemed);
 	}
 }
