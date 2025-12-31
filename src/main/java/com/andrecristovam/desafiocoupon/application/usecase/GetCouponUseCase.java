@@ -4,9 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.andrecristovam.desafiocoupon.domain.coupon.Coupon;
-import com.andrecristovam.desafiocoupon.domain.coupon.exception.NotFoundException;
-import com.andrecristovam.desafiocoupon.infrastructure.persistence.mapper.CouponPersistenceMapper;
-import com.andrecristovam.desafiocoupon.infrastructure.persistence.repository.CouponRepository;
+import com.andrecristovam.desafiocoupon.domain.exception.NotFoundException;
+import com.andrecristovam.desafiocoupon.infrastructure.mapper.CouponPersistenceMapper;
+import com.andrecristovam.desafiocoupon.infrastructure.repository.CouponRepository;
 
 import lombok.RequiredArgsConstructor;
 

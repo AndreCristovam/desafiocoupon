@@ -2,11 +2,12 @@ package com.andrecristovam.desafiocoupon.application.usecase;
 
 import org.springframework.stereotype.Service;
 
-import com.andrecristovam.desafiocoupon.application.usecase.mapper.CouponDomainMapper;
-import com.andrecristovam.desafiocoupon.application.usecase.model.CreateCouponCommand;
-import com.andrecristovam.desafiocoupon.application.usecase.model.SavedCouponResult;
-import com.andrecristovam.desafiocoupon.infrastructure.persistence.mapper.CouponPersistenceMapper;
-import com.andrecristovam.desafiocoupon.infrastructure.persistence.repository.CouponRepository;
+import com.andrecristovam.desafiocoupon.application.mapper.CouponDomainMapper;
+import com.andrecristovam.desafiocoupon.application.model.CreateCouponCommand;
+import com.andrecristovam.desafiocoupon.application.model.SavedCouponResult;
+import com.andrecristovam.desafiocoupon.domain.exception.BusinessException;
+import com.andrecristovam.desafiocoupon.infrastructure.mapper.CouponPersistenceMapper;
+import com.andrecristovam.desafiocoupon.infrastructure.repository.CouponRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,10 @@ public class CreateCouponUseCase {
 	public SavedCouponResult execute(CreateCouponCommand command) {
 
 		var coupon = domainMapper.toDomain(command);
+		
+		if (repository.existsByCode(coupon.getCode())) {
+		    throw new BusinessException("Já existe um cupom com este código");
+		}
 
 		var saved = repository.save(persistenceMapper.toEntity(coupon));
 		

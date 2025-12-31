@@ -3,8 +3,8 @@ package com.andrecristovam.desafiocoupon.domain.coupon;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import com.andrecristovam.desafiocoupon.domain.coupon.enun.ECouponStatus;
-import com.andrecristovam.desafiocoupon.domain.coupon.exception.BusinessException;
+import com.andrecristovam.desafiocoupon.domain.enun.ECouponStatus;
+import com.andrecristovam.desafiocoupon.domain.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
