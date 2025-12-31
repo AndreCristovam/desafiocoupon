@@ -2,6 +2,7 @@ package com.andrecristovam.desafiocoupon.domain.coupon;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -93,12 +94,88 @@ public class CouponTest {
 	}
 	
 	@Test
-	void deveRemoverCaracteresEspeciaisDoCodigo() {
+	void removerCaracteresEspeciaisDoCodigoTest() {
 
-	    Coupon coupon = Coupon.create("A!B-123", "Cupom", new BigDecimal("5.0"),
+	    Coupon coupon = Coupon.create("A!BC-123", "Cupom", new BigDecimal("5.0"),
 	    		tomorrow(), true);
 
-	    assertEquals("AB123", coupon.getCode());
+	    assertEquals("ABC123", coupon.getCode());
+	}
+	
+	@Test
+	void criarCupomComCodigoMaiorQueSeisCaracteresDeveFalharTest() {
+	    assertThrows(BusinessException.class, () -> 
+	        Coupon.create("ABCDEFG", "Cupom inválido",
+	                new BigDecimal("5.0"), tomorrow(), true)
+	    );
+	}
+
+	@Test
+	void criarCupomComDescricaoApenasComEspacosDeveFalharTest() {
+	    assertThrows(BusinessException.class, () ->
+	        Coupon.create("ABC123", "   ",
+	                new BigDecimal("5.0"), tomorrow(), true)
+	    );
+	}
+
+	@Test
+	void criarCupomComDescricaoNullTest() {
+	    BusinessException exception = assertThrows(BusinessException.class, () -> {
+	        Coupon.create("ABC123", null, new BigDecimal("10.0"), tomorrow(), true);
+	    });
+	    assertEquals("Descrição é obrigatória", exception.getMessage());
+	}
+
+	@Test
+	void criarCupomComDescontoNullTest() {
+	    BusinessException exception = assertThrows(BusinessException.class, () -> {
+	        Coupon.create("ABC123", "Cupom", null, tomorrow(), true);
+	    });
+	    assertEquals("Valor mínimo de desconto é 0.5", exception.getMessage());
+	}
+
+	@Test
+	void criarCupomSemDataDeExpiracaoTest() {
+	    BusinessException exception = assertThrows(BusinessException.class, () -> {
+	        Coupon.create("ABC123", "Cupom", new BigDecimal("5.0"), null, true);
+	    });
+	    assertEquals("Data de expiração não pode estar no passado", exception.getMessage());
+	}
+
+	@Test
+	void criarCupomComCodigoNullNaoExplodeSanitizeTest() {
+	    BusinessException exception = assertThrows(BusinessException.class, () -> {
+	        Coupon.create(null, "Cupom", new BigDecimal("5.0"), tomorrow(), true);
+	    });
+	    assertEquals("Código do cupom deve conter 6 caracteres alfanuméricos", exception.getMessage());
+	}
+	
+	@Test
+	void igualdadeEntreCuponsComMesmoCodigoDeveSerVerdadeiraTest() {
+
+	    Coupon a = Coupon.create("ABC123", "Cupom A", new BigDecimal("5.0"), tomorrow(), true);
+	    Coupon b = Coupon.create("ABC123", "Outro cupom", new BigDecimal("6.0"), tomorrow(), false);
+
+	    assertEquals(a, b);
+	    assertEquals(a.hashCode(), b.hashCode());
+	}
+
+	@Test
+	void cuponsComCodigosDiferentesNaoDevemSerIguaisTest() {
+
+	    Coupon a = Coupon.create("ABC123", "Cupom A", new BigDecimal("5.0"), tomorrow(), true);
+	    Coupon b = Coupon.create("XYZ999", "Cupom B", new BigDecimal("5.0"), tomorrow(), true);
+
+	    assertNotEquals(a, b);
+	}
+
+	@Test
+	void equalsDeveRetornarFalseParaNullOuOutroTipoTest() {
+
+	    Coupon coupon = Coupon.create("ABC123", "Cupom", new BigDecimal("5.0"), tomorrow(), true);
+
+	    assertNotEquals(coupon, null);
+	    assertNotEquals(coupon, "string qualquer");
 	}
 	
 	private OffsetDateTime tomorrow() {
