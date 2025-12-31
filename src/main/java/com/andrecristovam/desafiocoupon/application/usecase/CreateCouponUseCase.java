@@ -2,9 +2,10 @@ package com.andrecristovam.desafiocoupon.application.usecase;
 
 import org.springframework.stereotype.Service;
 
-import com.andrecristovam.desafiocoupon.domain.coupon.Coupon;
-import com.andrecristovam.desafiocoupon.infrastructure.persistence.entity.CouponEntity;
-import com.andrecristovam.desafiocoupon.infrastructure.persistence.mapper.CouponMapper;
+import com.andrecristovam.desafiocoupon.application.usecase.mapper.CouponDomainMapper;
+import com.andrecristovam.desafiocoupon.application.usecase.model.CreateCouponCommand;
+import com.andrecristovam.desafiocoupon.application.usecase.model.SavedCouponResult;
+import com.andrecristovam.desafiocoupon.infrastructure.persistence.mapper.CouponPersistenceMapper;
 import com.andrecristovam.desafiocoupon.infrastructure.persistence.repository.CouponRepository;
 
 import jakarta.transaction.Transactional;
@@ -15,18 +16,18 @@ import lombok.RequiredArgsConstructor;
 public class CreateCouponUseCase {
 
 	private final CouponRepository repository;
-	private final CouponMapper mapper;
+	
+	private final CouponPersistenceMapper persistenceMapper;
+	
+	private final CouponDomainMapper domainMapper;
 
 	@Transactional
-	public Coupon execute(String code, String description, java.math.BigDecimal discountValue,
-			java.time.LocalDate expirationDate, boolean published) {
+	public SavedCouponResult execute(CreateCouponCommand command) {
 
-		Coupon coupon = Coupon.create(code, description, discountValue, expirationDate, published);
+		var coupon = domainMapper.toDomain(command);
 
-		CouponEntity entity = mapper.toEntity(coupon);
-
-		repository.save(entity);
-
-		return coupon;
+		var saved = repository.save(persistenceMapper.toEntity(coupon));
+		
+		return new SavedCouponResult(saved.getId(), coupon);
 	}
 }
