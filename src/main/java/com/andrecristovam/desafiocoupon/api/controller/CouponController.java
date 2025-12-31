@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.andrecristovam.desafiocoupon.api.controller.dto.CouponResponse;
-import com.andrecristovam.desafiocoupon.api.controller.dto.CreateCouponRequest;
-import com.andrecristovam.desafiocoupon.api.controller.mapper.CouponApiMapper;
-import com.andrecristovam.desafiocoupon.api.controller.mapper.CouponCommandMapper;
+import com.andrecristovam.desafiocoupon.api.dto.CouponResponse;
+import com.andrecristovam.desafiocoupon.api.dto.CreateCouponRequest;
+import com.andrecristovam.desafiocoupon.api.mapper.CouponApiMapper;
+import com.andrecristovam.desafiocoupon.api.mapper.CouponCommandMapper;
 import com.andrecristovam.desafiocoupon.application.usecase.CreateCouponUseCase;
 import com.andrecristovam.desafiocoupon.application.usecase.DeleteCouponUseCase;
 import com.andrecristovam.desafiocoupon.application.usecase.GetCouponUseCase;
