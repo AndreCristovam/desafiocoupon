@@ -45,22 +45,40 @@ Principais decisões:
 
 ### ▶️ Rodar localmente
 
+Este projeto utiliza o **Maven Wrapper (`mvnw`)**, mas você também pode usar o Maven instalado localmente **(`mvn`)**.
+
+```bash
+mvnw clean package
+mvnw spring-boot:run
+```
+##### ou
 ```bash
 mvn clean package
 mvn spring-boot:run
+```
 
 A API ficará disponível em:
+```bash
 http://localhost:8080
 ```
 ---
 
 ## 🧪 Testes
 ### Rodar testes
+
+```bash
+mvnw test
+```
+##### ou
 ```bash
 mvn test
 ```
 
 ## Gerar relatório de cobertura
+```bash
+mvnw test jacoco:report
+```
+##### ou
 ```bash
 mvn test jacoco:report
 ```
@@ -72,7 +90,7 @@ target/site/jacoco/index.html
 ✔️ O projeto mantém ≥ 80% de cobertura nas regras de negócio
 
 ## 🐳 Executando com Docker
-Build + Run
+### Build + Run
 ```bash
 docker compose up --build
 ```
